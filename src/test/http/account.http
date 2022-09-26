@@ -4,5 +4,14 @@ Content-Type: application/json
 
 {
   "id": 1,
-  "initialBalance": "10000"
+  "initialBalance": "0"
+}
+
+### Create account
+DELETE http://localhost:8080/account
+Content-Type: application/json
+
+{
+  "id": 1,
+  "initialBalance": "10000000002"
 }
