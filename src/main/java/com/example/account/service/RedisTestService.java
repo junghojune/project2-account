@@ -19,7 +19,7 @@ public class RedisTestService {
         RLock lock = redissonClient.getLock("sampleLock");
 
         try {
-            boolean isLock = lock.tryLock(1, 5, TimeUnit.SECONDS);
+            boolean isLock = lock.tryLock(1, 3, TimeUnit.SECONDS);
             if (!isLock) {
                 log.error("=====Lock acquisition failed====");
                 return "lock failed";
