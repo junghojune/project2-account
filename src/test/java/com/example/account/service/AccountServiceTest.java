@@ -8,7 +8,6 @@ import com.example.account.repository.AccountUserRepository;
 import com.example.account.type.AccountStatus;
 import com.example.account.repository.AccountRepository;
 import com.example.account.type.ErrorCode;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
@@ -16,7 +15,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -176,7 +174,7 @@ class AccountServiceTest {
         AccountException accountException = assertThrows(AccountException.class,
                 () -> accountService.deleteAccount(1L, "1234567890"));
         //then
-        assertEquals(ErrorCode.Account_NOT_FOUND, accountException.getErrorCode());
+        assertEquals(ErrorCode.ACCOUNT_NOT_FOUND, accountException.getErrorCode());
     }
 
     @Test
@@ -223,6 +221,29 @@ class AccountServiceTest {
         assertEquals(ErrorCode.BALANCE_NOT_EMPTY, accountException.getErrorCode());
 
     }
+
+    @Test
+    void deleteAccountFailed_alreadyUnRegistered(){
+        //given
+        AccountUser pobi = AccountUser.builder()
+                .id(12L)
+                .name("Pobi").build();
+        given(accountUserRepository.findById(anyLong()))
+                .willReturn(Optional.of(pobi));
+        given(accountRepository.findByAccountNumber(anyString()))
+                .willReturn(Optional.of(Account.builder()
+                        .accountUser(pobi)
+                        .accountStatus(AccountStatus.UNREGISTERED)
+                        .balance(100L)
+                        .accountNumber("10000000012").build()));
+        //when
+        AccountException accountException = assertThrows(AccountException.class,
+                () -> accountService.deleteAccount(1L, "1234567890"));
+        //then
+        assertEquals(ErrorCode.ACCOUNT_ALREADY_UNREGISTERED, accountException.getErrorCode());
+
+    }
+
 
     @Test
     void successGetAccountsByUserId(){
